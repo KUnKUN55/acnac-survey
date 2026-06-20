@@ -32,6 +32,18 @@ var PROGRAMS = {
 
 var CLASS_ORDER = ["3/1", "3/2", "3/3", "3/4", "3/5", "3/EP"];
 
+// ลำดับสาขา + ชื่อย่อ (ใช้ตั้งชื่อแท็บ "อันดับ 1 แยกสาขา")
+var PROGRAM_ORDER = ["health", "preeng", "mgmtsci", "biz", "digital", "comm", "ep"];
+var PROGRAM_SHORT = {
+  "health":  "วิทย์สุขภาพ-การแพทย์",
+  "preeng":  "เตรียมวิศวกรรม",
+  "mgmtsci": "วิทย์การจัดการ",
+  "biz":     "บริหารธุรกิจ",
+  "digital": "สื่อดิจิทัล-นวัตกรรม",
+  "comm":    "นิเทศศาสตร์",
+  "ep":      "English Program"
+};
+
 /* ---------------- จุดรับ POST (บันทึกคำตอบ) ---------------- */
 function doPost(e) {
   var lock = LockService.getScriptLock();
@@ -70,8 +82,11 @@ function doPost(e) {
       sheet.appendRow(row);
     }
 
-    // อัปเดตแท็บแยกรายห้อง (เรียงเลขที่) อัตโนมัติ — ไม่ให้ error มากระทบการบันทึก
-    try { rebuildAllClassSheets(sheet.getParent()); } catch (ignore2) {}
+    // อัปเดตแท็บแยกรายห้อง + แท็บอันดับ 1 แยกสาขา อัตโนมัติ — ไม่ให้ error มากระทบการบันทึก
+    try {
+      rebuildAllClassSheets(sheet.getParent());
+      rebuildChoice1Sheets(sheet.getParent());
+    } catch (ignore2) {}
 
     return json({ ok: true, updated: updated });
   } catch (err) {
@@ -246,22 +261,107 @@ function writeClassSheet(ss, room, rows) {
   return sh;
 }
 
+/* ============================================================
+ *  แท็บ "อันดับ 1 แยกสาขา" — 7 ชีต (1 สาขา/ชีต)
+ *  รวมรายชื่อนักเรียนที่เลือกสาขานั้นเป็นอันดับ 1 + จำนวนรวม
+ * ============================================================ */
+function choice1SheetName(code) { return "① " + PROGRAM_SHORT[code]; }
+
+function rebuildChoice1Sheets(ss) {
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
+  var resp = ss.getSheetByName(SHEET_NAME);
+  var values = resp ? resp.getDataRange().getValues() : [];
+
+  PROGRAM_ORDER.forEach(function (code, idx) {
+    var thName = PROGRAMS[code];
+    var rows = [];
+    for (var i = 1; i < values.length; i++) {
+      if (String(values[i][5]) === thName) rows.push(values[i]); // คอลัมน์ F = อันดับ1
+    }
+    rows.sort(function (a, b) {
+      var ca = CLASS_ORDER.indexOf(String(a[4])), cb = CLASS_ORDER.indexOf(String(b[4]));
+      if (ca !== cb) return ca - cb;
+      return (parseInt(a[3], 10) || 0) - (parseInt(b[3], 10) || 0);
+    });
+    var sh = writeChoice1Sheet(ss, code, thName, rows);
+    ss.setActiveSheet(sh);
+    ss.moveActiveSheet(8 + idx); // ต่อจาก Responses(1) + แท็บห้อง(2-7)
+  });
+
+  if (resp) ss.setActiveSheet(resp);
+}
+
+function writeChoice1Sheet(ss, code, thName, rows) {
+  var name = choice1SheetName(code);
+  var sh = ss.getSheetByName(name) || ss.insertSheet(name);
+  sh.clear();
+  sh.getRange(1, 1, 1, 6).breakApart(); // ล้าง merge เดิม
+
+  var header = ["ห้อง", "เลขที่", "รหัสนักเรียน", "ชื่อ-นามสกุล", "อันดับ 2", "อันดับ 3"];
+  var title = "นักเรียนที่เลือก “" + thName + "” เป็นอันดับ 1   ·   รวม " + rows.length + " คน";
+
+  // เลขที่/รหัส เป็นข้อความล้วน
+  sh.getRangeList(["B:B", "C:C"]).setNumberFormat("@");
+
+  // แถวชื่อเรื่อง (รวมเซลล์)
+  sh.getRange(1, 1, 1, header.length).merge().setValue(title)
+    .setFontWeight("bold").setFontColor("#ffffff").setBackground("#6d1422")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle");
+  sh.setRowHeight(1, 38);
+
+  // หัวตาราง
+  sh.getRange(2, 1, 1, header.length).setValues([header])
+    .setFontWeight("bold").setBackground("#8a1c2b").setFontColor("#ffffff")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle");
+  sh.setFrozenRows(2);
+
+  if (rows.length) {
+    var out = rows.map(function (v) {
+      return ["ม." + String(v[4]), String(v[3]), String(v[1]), String(v[2]), v[6], v[7]];
+    });
+    sh.getRange(3, 1, out.length, header.length).setValues(out);
+    sh.getRange(2, 1, out.length + 1, header.length)
+      .setBorder(true, true, true, true, true, true, "#e6ddcf", SpreadsheetApp.BorderStyle.SOLID);
+    sh.getRange(3, 1, out.length, 3).setHorizontalAlignment("center"); // ห้อง/เลขที่/รหัส
+    var bg = [];
+    for (var r = 0; r < out.length; r++) {
+      var c = (r % 2 === 0) ? "#ffffff" : "#faf7f1";
+      bg.push([c, c, c, c, c, c]);
+    }
+    sh.getRange(3, 1, out.length, header.length).setBackgrounds(bg);
+  } else {
+    sh.getRange(3, 1).setValue("— ยังไม่มีนักเรียนเลือกสาขานี้เป็นอันดับ 1 —").setFontColor("#999999");
+  }
+
+  sh.setColumnWidth(1, 70);
+  sh.setColumnWidth(2, 60);
+  sh.setColumnWidth(3, 115);
+  sh.setColumnWidth(4, 210);
+  sh.setColumnWidth(5, 235);
+  sh.setColumnWidth(6, 235);
+  return sh;
+}
+
 /* ---------------- เมนูในตัว Google Sheet ---------------- */
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("📋 แบบสอบถามสาขา")
-    .addItem("🔄 จัดเรียงข้อมูลแยกห้องใหม่", "menuRebuild")
+    .addItem("🔄 จัดเรียงข้อมูลทุกแท็บใหม่", "menuRebuild")
     .addToUi();
 }
 
 function menuRebuild() {
-  rebuildAllClassSheets(SpreadsheetApp.getActiveSpreadsheet());
-  SpreadsheetApp.getActive().toast("จัดเรียงข้อมูลแยกห้องเรียบร้อยแล้ว", "✅ สำเร็จ", 4);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  rebuildAllClassSheets(ss);
+  rebuildChoice1Sheets(ss);
+  SpreadsheetApp.getActive().toast("จัดเรียงแท็บแยกห้อง + อันดับ 1 แยกสาขา เรียบร้อยแล้ว", "✅ สำเร็จ", 4);
 }
 
 /* ---------------- ทดสอบ/ติดตั้งจากในตัวแก้ไข ---------------- */
 function setupSheet() {
   getSheet();
-  rebuildAllClassSheets(SpreadsheetApp.getActiveSpreadsheet());
-  Logger.log("สร้าง/ตรวจสอบชีต + แท็บแยกห้องเรียบร้อย");
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  rebuildAllClassSheets(ss);
+  rebuildChoice1Sheets(ss);
+  Logger.log("สร้าง/ตรวจสอบชีต + แท็บแยกห้อง + แท็บอันดับ 1 แยกสาขา เรียบร้อย");
 }
