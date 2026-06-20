@@ -6,7 +6,7 @@
    ============================================================ */
 window.APP_CONFIG = {
   // วาง URL ของ Google Apps Script Web App ตรงนี้ (ลงท้าย .../exec)
-  GAS_URL: "PASTE_YOUR_GAS_WEB_APP_URL_HERE",
+  GAS_URL: "https://script.google.com/macros/s/AKfycbzjCZKGRu2x8gvWOSyiz5aCr1GGW7DWaqN_p3g26CPBT83h5DG3Yz1ak-GTTakrAroiAQ/exec",
 
   // รหัสผ่านสำหรับเข้าหน้า Dashboard ของครู
   TEACHER_PASSCODE: "ACNAC1967",
