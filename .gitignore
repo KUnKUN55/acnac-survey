@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel
+.vercel
+
+# Node (เผื่ออนาคต)
+node_modules/
+npm-debug.log*
+
+# ต้นฉบับรูปโลโก้ (ใช้ assets/img/logo.jpg แทน)
+IMG_3410.JPG

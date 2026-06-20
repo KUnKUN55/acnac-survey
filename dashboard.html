@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8a1c2b" />
+  <title>Dashboard ครู | แบบสอบถามความสนใจสาขา</title>
+  <link rel="icon" href="assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== ประตูรหัสผ่าน ===== -->
+  <div class="container" id="gateWrap">
+    <div class="card gate">
+      <img class="logo-center" src="assets/img/logo.jpg" alt="ตราโรงเรียน" />
+      <h2 class="card__title" style="justify-content:center">Dashboard สำหรับครู</h2>
+      <p class="card__subtitle" style="text-align:center">กรุณากรอกรหัสผ่านเพื่อเข้าดูข้อมูล</p>
+      <div id="gateAlert" class="alert"></div>
+      <form id="gateForm">
+        <div class="field">
+          <label for="passcode">รหัสผ่าน</label>
+          <input class="input" id="passcode" type="password" autocomplete="off" placeholder="กรอกรหัสผ่าน" />
+        </div>
+        <button class="btn btn--primary" type="submit" id="gateBtn">เข้าสู่ระบบ</button>
+      </form>
+      <p style="text-align:center;margin:16px 0 0">
+        <a href="index.html" class="tap-hint">← กลับไปหน้าแบบสอบถาม</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== Dashboard ===== -->
+  <div class="container container--wide" id="dashWrap" style="display:none">
+
+    <div class="topbar">
+      <header class="site-header">
+        <img class="logo" src="assets/img/logo.jpg" alt="ตราโรงเรียน" />
+        <div class="site-header__text">
+          <h1>Dashboard ความสนใจสาขา</h1>
+          <p>โรงเรียนอัสสัมชัญนครราชสีมา · ชั้น ม.3</p>
+        </div>
+      </header>
+      <button class="btn btn--gold btn--sm" id="refreshBtn">↻ รีเฟรชข้อมูล</button>
+      <button class="btn btn--ghost btn--sm" id="logoutBtn">ออกจากระบบ</button>
+    </div>
+
+    <!-- สถิติรวม -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- แท็บ -->
+    <div class="dash-tabs">
+      <button class="tab active" data-tab="overall">ภาพรวมสายชั้น</button>
+      <button class="tab" data-tab="byroom">แยกรายห้อง</button>
+      <button class="tab" data-tab="individual">รายบุคคล</button>
+    </div>
+
+    <div id="dashBody">
+      <div class="loading-block" id="loadingBlock">
+        <div class="spinner spinner--dark"></div>
+        กำลังโหลดข้อมูล...
+      </div>
+
+      <!-- TAB: ภาพรวม -->
+      <section class="tab-panel active" data-panel="overall">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3><span class="rank-pill r1">1</span> อันดับ 1 ของทั้งสายชั้น</h3>
+            <p class="sub">สาขาที่นักเรียนเลือกเป็นอันดับ 1 มากที่สุด</p>
+            <div class="chart-wrap"><canvas id="chartOverall1"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3><span class="rank-pill r2">2</span> อันดับ 2 ของทั้งสายชั้น</h3>
+            <p class="sub">สาขาที่นักเรียนเลือกเป็นอันดับ 2</p>
+            <div class="chart-wrap"><canvas id="chartOverall2"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3><span class="rank-pill r3">3</span> อันดับ 3 ของทั้งสายชั้น</h3>
+            <p class="sub">สาขาที่นักเรียนเลือกเป็นอันดับ 3</p>
+            <div class="chart-wrap"><canvas id="chartOverall3"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: รายห้อง -->
+      <section class="tab-panel" data-panel="byroom">
+        <div class="toolbar">
+          <label for="roomSelect">เลือกห้อง:</label>
+          <select class="input" id="roomSelect"></select>
+          <span class="tap-hint" id="roomCount"></span>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3><span class="rank-pill r1">1</span> อันดับ 1 ของห้อง</h3>
+            <div class="chart-wrap"><canvas id="chartRoom1"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3><span class="rank-pill r2">2</span> อันดับ 2 ของห้อง</h3>
+            <div class="chart-wrap"><canvas id="chartRoom2"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <h3><span class="rank-pill r3">3</span> อันดับ 3 ของห้อง</h3>
+            <div class="chart-wrap"><canvas id="chartRoom3"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: รายบุคคล -->
+      <section class="tab-panel" data-panel="individual">
+        <div class="toolbar">
+          <input class="input" id="searchInput" placeholder="🔍 ค้นหา ชื่อ / รหัสนักเรียน / เลขที่" />
+          <select class="input" id="filterRoom">
+            <option value="">ทุกห้อง</option>
+          </select>
+        </div>
+        <div id="individualList"></div>
+      </section>
+    </div>
+
+    <footer class="site-footer">
+      © โรงเรียนอัสสัมชัญนครราชสีมา · ข้อมูลสำหรับครูเท่านั้น
+    </footer>
+  </div>
+
+  <!-- ===== Modal รายละเอียดนักเรียน ===== -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="modal__head">
+        <button class="modal__close" id="modalClose">×</button>
+        <h3 id="modalName">—</h3>
+        <p id="modalMeta">—</p>
+      </div>
+      <div class="modal__body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

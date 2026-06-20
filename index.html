@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8a1c2b" />
+  <title>แบบสอบถามความสนใจสาขา | อัสสัมชัญนครราชสีมา</title>
+  <meta name="description" content="แบบสอบถามความสนใจสาขาสำหรับนักเรียนชั้น ม.3 โรงเรียนอัสสัมชัญนครราชสีมา" />
+  <link rel="icon" href="assets/img/logo.jpg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <header class="site-header">
+      <img class="logo" src="assets/img/logo.jpg" alt="ตราโรงเรียนอัสสัมชัญนครราชสีมา" />
+      <div class="site-header__text">
+        <h1>แบบสอบถามความสนใจสาขา</h1>
+        <p>โรงเรียนอัสสัมชัญนครราชสีมา · สำหรับนักเรียนชั้น ม.3</p>
+        <p class="en">Program Interest Survey · Assumption College Nakhon Ratchasima</p>
+      </div>
+    </header>
+
+    <!-- ===== ฟอร์ม ===== -->
+    <form id="surveyForm" novalidate>
+
+      <div id="alert" class="alert"></div>
+
+      <!-- ขั้นที่ 1: ข้อมูลนักเรียน -->
+      <section class="card">
+        <h2 class="card__title"><span class="step-badge">1</span> ข้อมูลนักเรียน</h2>
+        <p class="card__subtitle">กรอกข้อมูลให้ครบถ้วนและถูกต้อง</p>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="studentId">รหัสนักเรียน <span class="req">*</span> <span class="hint">(ตัวเลข 5 หลัก)</span></label>
+            <input class="input" id="studentId" name="studentId" inputmode="numeric" maxlength="5"
+                   autocomplete="off" placeholder="เช่น 12345" />
+            <div class="field-error" data-for="studentId"></div>
+          </div>
+          <div class="field">
+            <label for="number">เลขที่ <span class="req">*</span></label>
+            <input class="input" id="number" name="number" inputmode="numeric" maxlength="2"
+                   autocomplete="off" placeholder="เช่น 12" />
+            <div class="field-error" data-for="number"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="fullname">ชื่อ - นามสกุล <span class="req">*</span></label>
+          <input class="input" id="fullname" name="fullname" autocomplete="off"
+                 placeholder="เช่น เด็กชายสมชาย ใจดี" />
+          <div class="field-error" data-for="fullname"></div>
+        </div>
+
+        <div class="field">
+          <label for="classroom">ชั้น <span class="req">*</span> <span class="hint">(ม.3 เท่านั้น)</span></label>
+          <select class="input" id="classroom" name="classroom">
+            <option value="" disabled selected>— เลือกห้องเรียน —</option>
+          </select>
+          <div class="field-error" data-for="classroom"></div>
+        </div>
+      </section>
+
+      <!-- ขั้นที่ 2: เลือกสาขา -->
+      <section class="card">
+        <h2 class="card__title"><span class="step-badge">2</span> จัดอันดับสาขาที่สนใจ</h2>
+        <p class="card__subtitle">แตะเลือกสาขาที่สนใจ <b>3 อันดับ</b> ระบบจะใส่หมายเลขอันดับให้อัตโนมัติ (แตะซ้ำเพื่อยกเลิก)</p>
+
+        <div class="programs" id="programs"><!-- เติมด้วย JS --></div>
+
+        <div class="rank-summary" id="rankSummary"><!-- เติมด้วย JS --></div>
+      </section>
+
+      <section class="card">
+        <button type="submit" class="btn btn--primary" id="submitBtn">
+          <span class="btn-label">ส่งแบบสอบถาม</span>
+        </button>
+      </section>
+    </form>
+
+    <!-- ===== หน้าจอสำเร็จ ===== -->
+    <section class="card success" id="successScreen" style="display:none">
+      <div class="success__icon">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </svg>
+      </div>
+      <h2>ส่งแบบสอบถามเรียบร้อยแล้ว!</h2>
+      <p>ขอบคุณที่ร่วมตอบแบบสอบถามความสนใจสาขา</p>
+      <div class="success__detail" id="successDetail"></div>
+      <div style="margin-top:22px">
+        <button class="btn btn--ghost btn--sm" id="againBtn">ส่งคำตอบของอีกคน</button>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      © โรงเรียนอัสสัมชัญนครราชสีมา · ระบบแบบสอบถามความสนใจสาขา
+    </footer>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/survey.js"></script>
+</body>
+</html>
