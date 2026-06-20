@@ -6,6 +6,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Claude Code local settings (เฉพาะเครื่อง ไม่ต้องขึ้น repo)
+.claude/settings.local.json
+
 # Vercel
 .vercel
 
