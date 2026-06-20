@@ -126,6 +126,11 @@ function getSheet() {
     sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold").setBackground("#8a1c2b").setFontColor("#ffffff");
     sheet.setFrozenRows(1);
   }
+
+  // บังคับคอลัมน์ รหัสนักเรียน(B) / เลขที่(D) / ชั้น(E) ให้เป็น "ข้อความล้วน"
+  // กัน Google Sheets แปลง "3/1" เป็นวันที่ และกันรหัสนักเรียนเลข 0 นำหน้าหาย
+  sheet.getRangeList(["B2:B", "D2:D", "E2:E"]).setNumberFormat("@");
+
   return sheet;
 }
 
