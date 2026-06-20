@@ -70,6 +70,9 @@ function doPost(e) {
       sheet.appendRow(row);
     }
 
+    // อัปเดตแท็บแยกรายห้อง (เรียงเลขที่) อัตโนมัติ — ไม่ให้ error มากระทบการบันทึก
+    try { rebuildAllClassSheets(sheet.getParent()); } catch (ignore2) {}
+
     return json({ ok: true, updated: updated });
   } catch (err) {
     return json({ ok: false, error: String(err) });
@@ -162,8 +165,103 @@ function json(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/* ---------------- ทดสอบจากในตัวแก้ไข (ไม่บังคับ) ---------------- */
+/* ============================================================
+ *  แท็บแยกรายห้อง — ดูแยกชั้นได้ เรียงตามเลขที่ (สวยงาม)
+ *  สร้าง/อัปเดตอัตโนมัติทุกครั้งที่มีการบันทึก และสั่งเองได้จากเมนู
+ * ============================================================ */
+
+// ชื่อแท็บของแต่ละห้อง (Sheet name ห้ามมี "/" จึงใช้ "-")
+function classSheetName(c) { return "ม." + String(c).replace("/", "-"); }
+
+function rebuildAllClassSheets(ss) {
+  ss = ss || SpreadsheetApp.getActiveSpreadsheet();
+  var resp = ss.getSheetByName(SHEET_NAME);
+  var values = resp ? resp.getDataRange().getValues() : [];
+
+  // จัดกลุ่มตามห้อง
+  var byRoom = {};
+  CLASS_ORDER.forEach(function (c) { byRoom[c] = []; });
+  for (var i = 1; i < values.length; i++) {
+    var v = values[i];
+    var room = String(v[4]);
+    if (byRoom.hasOwnProperty(room)) byRoom[room].push(v);
+  }
+
+  CLASS_ORDER.forEach(function (room, idx) {
+    var rows = byRoom[room];
+    rows.sort(function (a, b) { return (parseInt(a[3], 10) || 0) - (parseInt(b[3], 10) || 0); });
+    var sh = writeClassSheet(ss, room, rows);
+    ss.setActiveSheet(sh);
+    ss.moveActiveSheet(idx + 2); // ให้เรียงต่อจากแท็บ Responses
+  });
+
+  if (resp) ss.setActiveSheet(resp);
+}
+
+function writeClassSheet(ss, room, rows) {
+  var name = classSheetName(room);
+  var sh = ss.getSheetByName(name) || ss.insertSheet(name);
+  sh.clear();
+
+  var header = ["เลขที่", "รหัสนักเรียน", "ชื่อ-นามสกุล", "อันดับ 1", "อันดับ 2", "อันดับ 3"];
+  var out = [header];
+  rows.forEach(function (v) {
+    out.push([String(v[3]), String(v[1]), String(v[2]), v[5], v[6], v[7]]);
+  });
+
+  // คอลัมน์ เลขที่/รหัส เป็นข้อความล้วน (กันเพี้ยน)
+  sh.getRangeList(["A:A", "B:B"]).setNumberFormat("@");
+  sh.getRange(1, 1, out.length, header.length).setValues(out);
+
+  // หัวตาราง
+  sh.getRange(1, 1, 1, header.length)
+    .setFontWeight("bold").setBackground("#8a1c2b").setFontColor("#ffffff")
+    .setHorizontalAlignment("center").setVerticalAlignment("middle");
+  sh.setFrozenRows(1);
+  sh.setRowHeight(1, 34);
+
+  if (out.length > 1) {
+    var n = out.length - 1;
+    sh.getRange(1, 1, out.length, header.length)
+      .setBorder(true, true, true, true, true, true, "#e6ddcf", SpreadsheetApp.BorderStyle.SOLID);
+    sh.getRange(2, 1, n, 2).setHorizontalAlignment("center"); // เลขที่ + รหัส
+    // แถบสลับสีอ่านง่าย (เรียกครั้งเดียว)
+    var bg = [];
+    for (var r = 0; r < n; r++) {
+      var c = (r % 2 === 0) ? "#ffffff" : "#faf7f1";
+      bg.push([c, c, c, c, c, c]);
+    }
+    sh.getRange(2, 1, n, header.length).setBackgrounds(bg);
+  } else {
+    sh.getRange(2, 1).setValue("— ยังไม่มีนักเรียนในห้องนี้ —").setFontColor("#999999");
+  }
+
+  // ความกว้างคอลัมน์
+  sh.setColumnWidth(1, 60);
+  sh.setColumnWidth(2, 115);
+  sh.setColumnWidth(3, 210);
+  sh.setColumnWidth(4, 235);
+  sh.setColumnWidth(5, 235);
+  sh.setColumnWidth(6, 235);
+  return sh;
+}
+
+/* ---------------- เมนูในตัว Google Sheet ---------------- */
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("📋 แบบสอบถามสาขา")
+    .addItem("🔄 จัดเรียงข้อมูลแยกห้องใหม่", "menuRebuild")
+    .addToUi();
+}
+
+function menuRebuild() {
+  rebuildAllClassSheets(SpreadsheetApp.getActiveSpreadsheet());
+  SpreadsheetApp.getActive().toast("จัดเรียงข้อมูลแยกห้องเรียบร้อยแล้ว", "✅ สำเร็จ", 4);
+}
+
+/* ---------------- ทดสอบ/ติดตั้งจากในตัวแก้ไข ---------------- */
 function setupSheet() {
   getSheet();
-  Logger.log("สร้าง/ตรวจสอบชีต '" + SHEET_NAME + "' เรียบร้อย");
+  rebuildAllClassSheets(SpreadsheetApp.getActiveSpreadsheet());
+  Logger.log("สร้าง/ตรวจสอบชีต + แท็บแยกห้องเรียบร้อย");
 }

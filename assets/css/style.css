@@ -341,6 +341,21 @@ select.input {
 .loading-block { text-align: center; padding: 40px 10px; color: var(--muted); }
 .loading-block .spinner { margin: 0 auto 12px; }
 
+/* ---------- Teacher access link ---------- */
+.teacher-access {
+  text-align: center;
+  margin-top: 26px;
+}
+.teacher-access .btn {
+  color: var(--maroon);
+  border-color: #e3d9cb;
+  background: rgba(255, 255, 255, 0.7);
+}
+.teacher-access .btn:hover {
+  border-color: var(--maroon-light);
+  background: #fff;
+}
+
 /* ---------- Footer ---------- */
 .site-footer {
   text-align: center;
