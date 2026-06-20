@@ -181,8 +181,8 @@
       return '<div class="lg-row' + (x.n === 0 ? ' lg-zero' : '') + '">' +
         '<span class="lg-rank">' + (idx + 1) + '</span>' +
         '<span class="lg-dot" style="background:' + x.color + '"></span>' +
-        '<span class="lg-name" title="' + x.name + '">' + x.name + '</span>' +
-        '<span class="lg-val"><b>' + x.n + '</b> คน · ' + pct + '%</span>' +
+        '<span class="lg-name" title="' + x.name + ' — ' + x.n + ' คน">' + x.name + '</span>' +
+        '<span class="lg-val"><b>' + pct + '%</b></span>' +
         '</div>';
     }).join("");
   }

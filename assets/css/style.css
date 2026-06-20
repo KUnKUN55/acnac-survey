@@ -463,8 +463,10 @@ select.input {
   margin-top: 16px;
   border-top: 1px dashed var(--line);
   padding-top: 12px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 2px;
+  width: 100%;
 }
 .lg-row {
   display: flex;
@@ -507,11 +509,10 @@ select.input {
 }
 .lg-val {
   flex: 0 0 auto;
-  min-width: 76px;
+  min-width: 46px;
   text-align: right;
   margin-left: 8px;
-  color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   white-space: nowrap;
 }
 .lg-val b { color: var(--maroon); font-weight: 800; }
