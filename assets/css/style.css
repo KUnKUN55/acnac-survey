@@ -458,6 +458,62 @@ select.input {
 .chart-wrap { position: relative; height: 260px; }
 .chart-empty { text-align:center; color: var(--muted); padding: 40px 0; font-size: 0.9rem; }
 
+/* ---------- คำอธิบายใต้กราฟแบบจัดอันดับ ---------- */
+.chart-legend {
+  margin-top: 16px;
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+  display: grid;
+  gap: 2px;
+}
+.lg-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  transition: background 0.12s;
+}
+.lg-row:hover { background: #faf7f1; }
+.lg-rank {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #efe9df;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.lg-row:nth-child(1) .lg-rank { background: var(--gold); color: #4a3608; }
+.lg-row:nth-child(2) .lg-rank { background: #c3ccd8; color: #2b3a4d; }
+.lg-row:nth-child(3) .lg-rank { background: #e3b48f; color: #5a3414; }
+.lg-dot {
+  width: 12px; height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.06);
+}
+.lg-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.lg-val {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+.lg-val b { color: var(--maroon); font-weight: 800; }
+.lg-zero { opacity: 0.45; }
+.lg-zero .lg-val b { color: var(--muted); }
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;

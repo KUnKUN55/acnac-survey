@@ -153,9 +153,38 @@
   }
 
   function renderOverallCharts() {
-    drawPie("chartOverall1", "overall1", toChartData(countByChoice(allData, "choice1")));
-    drawPie("chartOverall2", "overall2", toChartData(countByChoice(allData, "choice2")));
-    drawPie("chartOverall3", "overall3", toChartData(countByChoice(allData, "choice3")));
+    drawRankChart("chartOverall1", "overall1", "legendOverall1", countByChoice(allData, "choice1"));
+    drawRankChart("chartOverall2", "overall2", "legendOverall2", countByChoice(allData, "choice2"));
+    drawRankChart("chartOverall3", "overall3", "legendOverall3", countByChoice(allData, "choice3"));
+  }
+
+  // วาดกราฟวงกลม + คำอธิบายใต้กราฟแบบจัดอันดับ (1-7 พร้อม %)
+  function drawRankChart(canvasId, key, legendId, counts) {
+    drawPie(canvasId, key, toChartData(counts));
+    renderRankedLegend(legendId, counts);
+  }
+
+  // คำอธิบายใต้กราฟ: เรียงจากมากไปน้อย โชว์ครบทั้ง 7 สาขา + จำนวน + %
+  function renderRankedLegend(legendId, counts) {
+    var el = document.getElementById(legendId);
+    if (!el) return;
+    var total = 0;
+    CFG.PROGRAMS.forEach(function (p) { total += counts[p.id] || 0; });
+
+    var arr = CFG.PROGRAMS.map(function (p, i) {
+      return { name: p.th, color: COLORS[i], n: counts[p.id] || 0 };
+    });
+    arr.sort(function (a, b) { return b.n - a.n; }); // มากไปน้อย
+
+    el.innerHTML = arr.map(function (x, idx) {
+      var pct = total ? Math.round((x.n / total) * 100) : 0;
+      return '<div class="lg-row' + (x.n === 0 ? ' lg-zero' : '') + '">' +
+        '<span class="lg-rank">' + (idx + 1) + '</span>' +
+        '<span class="lg-dot" style="background:' + x.color + '"></span>' +
+        '<span class="lg-name">' + x.name + '</span>' +
+        '<span class="lg-val"><b>' + x.n + '</b> คน · ' + pct + '%</span>' +
+        '</div>';
+    }).join("");
   }
 
   function drawPie(canvasId, key, cd) {
@@ -196,15 +225,7 @@
         maintainAspectRatio: false,
         cutout: "55%",
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: {
-              font: { family: "'Noto Sans Thai', sans-serif", size: 11 },
-              padding: 10,
-              boxWidth: 12,
-              usePointStyle: true
-            }
-          },
+          legend: { display: false }, // ใช้คำอธิบายแบบจัดอันดับด้านล่างแทน
           tooltip: {
             bodyFont: { family: "'Noto Sans Thai', sans-serif" },
             titleFont: { family: "'Noto Sans Thai', sans-serif" },
@@ -240,9 +261,9 @@
   function renderRoomCharts(room) {
     var rows = allData.filter(function (r) { return r.classroom === room; });
     document.getElementById("roomCount").textContent = "(" + rows.length + " คนในห้องนี้)";
-    drawPie("chartRoom1", "room1", toChartData(countByChoice(rows, "choice1")));
-    drawPie("chartRoom2", "room2", toChartData(countByChoice(rows, "choice2")));
-    drawPie("chartRoom3", "room3", toChartData(countByChoice(rows, "choice3")));
+    drawRankChart("chartRoom1", "room1", "legendRoom1", countByChoice(rows, "choice1"));
+    drawRankChart("chartRoom2", "room2", "legendRoom2", countByChoice(rows, "choice2"));
+    drawRankChart("chartRoom3", "room3", "legendRoom3", countByChoice(rows, "choice3"));
   }
 
   /* ===================== แท็บรายบุคคล ===================== */
