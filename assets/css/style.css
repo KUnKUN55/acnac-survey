@@ -350,7 +350,9 @@ select.input {
   color: var(--maroon);
   border-color: #e3d9cb;
   background: rgba(255, 255, 255, 0.7);
+  line-height: 1;
 }
+.teacher-access .btn svg { flex-shrink: 0; }
 .teacher-access .btn:hover {
   border-color: var(--maroon-light);
   background: #fff;
