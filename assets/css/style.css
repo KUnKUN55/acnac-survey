@@ -503,11 +503,15 @@ select.input {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
+  font-size: 0.85rem;
 }
 .lg-val {
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  min-width: 76px;
+  text-align: right;
+  margin-left: 8px;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   white-space: nowrap;
 }
 .lg-val b { color: var(--maroon); font-weight: 800; }
