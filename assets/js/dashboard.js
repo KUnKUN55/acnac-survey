@@ -372,19 +372,23 @@
       { n: 2, id: r.choice2, cls: "r2" },
       { n: 3, id: r.choice3, cls: "r3" }
     ];
+    var ans = r.answers || {};
     var ranksHtml = ranks.map(function (x) {
       if (!x.id) return "";
       var p = window.programById(x.id);
+      var reason = ans["reason" + x.n];
+      var reasonHtml = (reason && String(reason).trim())
+        ? '<div class="detail-reason"><b>เหตุผล:</b> ' + esc(String(reason)) + "</div>"
+        : "";
       return '<div class="detail-rank">' +
         '<div class="num ' + x.cls + '">' + x.n + "</div>" +
         '<div class="txt">' + (p ? esc(p.th) : "-") +
-        (p && p.en ? "<small>" + esc(p.en) + "</small>" : "") + "</div></div>";
+        (p && p.en ? "<small>" + esc(p.en) + "</small>" : "") + reasonHtml + "</div></div>";
     }).join("");
 
     // คำตอบคำถามเพิ่มเติม
     var extraHtml = "";
     var qs = CFG.QUESTIONS || [];
-    var ans = r.answers || {};
     if (qs.length) {
       var rows = qs.map(function (q) {
         var a = ans[q.id];
@@ -431,6 +435,10 @@
       if (draft) draft.rankCount = Math.max(1, Math.min(parseInt(this.value, 10) || 1, draft.programs.length));
       this.value = draft ? draft.rankCount : this.value;
     });
+
+    document.getElementById("askReasonInput").addEventListener("change", function () {
+      if (draft) draft.askReason = this.checked;
+    });
   }
 
   function ensureDraft() {
@@ -443,6 +451,7 @@
       programs: (CFG.PROGRAMS || []).map(function (p) { return { id: p.id, th: p.th, en: p.en || "" }; }),
       classes: (CFG.CLASSES || []).slice(),
       rankCount: CFG.rankCount || 3,
+      askReason: !!CFG.askReason,
       questions: (CFG.QUESTIONS || []).map(function (q) {
         return { id: q.id, label: q.label, type: q.type, max: q.max, required: !!q.required };
       })
@@ -465,6 +474,7 @@
 
     document.getElementById("rankCountInput").value = draft.rankCount;
     document.getElementById("rankCountInput").max = draft.programs.length;
+    document.getElementById("askReasonInput").checked = !!draft.askReason;
 
     // ห้องเรียน
     var cl = document.getElementById("classList");

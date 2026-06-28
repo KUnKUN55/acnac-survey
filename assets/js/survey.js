@@ -8,6 +8,7 @@
   var form = document.getElementById("surveyForm");
   var programsEl = document.getElementById("programs");
   var rankSummaryEl = document.getElementById("rankSummary");
+  var rankReasonsEl = document.getElementById("rankReasons");
   var rankSubtitleEl = document.getElementById("rankSubtitle");
   var extraEl = document.getElementById("extraQuestions");
   var classroomSel = document.getElementById("classroom");
@@ -18,14 +19,18 @@
   var picked = [];          // id สาขาตามลำดับที่เลือก
   var rankCount = 3;        // จำนวนอันดับที่ต้องเลือก (ตั้งจาก config)
   var answers = {};         // คำตอบคำถามเพิ่มเติม { questionId: value }
+  var askReason = false;    // ถามเหตุผลของแต่ละอันดับหรือไม่
+  var reasonByProgram = {}; // เหตุผลของแต่ละสาขา { programId: ข้อความ }
 
   // โหลดค่าตั้งค่าจริงจาก Sheet ก่อน แล้วค่อยสร้างฟอร์ม (มี fallback ในตัว)
   window.loadLiveConfig(function () { buildForm(); });
 
   function buildForm() {
     rankCount = Math.max(1, Math.min(CFG.rankCount || 3, CFG.PROGRAMS.length));
+    askReason = !!CFG.askReason;
     picked = [];
     answers = {};
+    reasonByProgram = {};
 
     buildClasses();
     buildPrograms();
@@ -112,6 +117,34 @@
         (prog ? esc(prog.th) : '<span class="empty">ยังไม่ได้เลือก</span>');
       rankSummaryEl.appendChild(row);
     }
+
+    renderReasons();
+  }
+
+  /* ---------- เหตุผลของแต่ละอันดับ (เด้งตามที่เลือก) ---------- */
+  function renderReasons() {
+    if (!rankReasonsEl) return;
+    if (!askReason || !picked.length) { rankReasonsEl.innerHTML = ""; return; }
+
+    rankReasonsEl.innerHTML = picked.map(function (id, i) {
+      var p = window.programById(id);
+      var val = reasonByProgram[id] || "";
+      return '<div class="reason-box" data-pid="' + esc(id) + '">' +
+        '<label><span class="reason-rank">อันดับ ' + (i + 1) + '</span> ' +
+          'เหตุผลที่เลือก “' + esc(p ? p.th : "") + '” <span class="req">*</span></label>' +
+        '<textarea class="input reason-text" data-pid="' + esc(id) + '" rows="2" ' +
+          'placeholder="พิมพ์เหตุผล...">' + esc(val) + '</textarea>' +
+        '<div class="field-error" data-for="reason-' + esc(id) + '"></div>' +
+        '</div>';
+    }).join("");
+
+    rankReasonsEl.querySelectorAll(".reason-text").forEach(function (ta) {
+      ta.addEventListener("input", function () {
+        reasonByProgram[ta.dataset.pid] = ta.value;
+        var box = rankReasonsEl.querySelector('.field-error[data-for="reason-' + ta.dataset.pid + '"]');
+        if (box && ta.value.trim()) box.classList.remove("show");
+      });
+    });
   }
 
   /* ---------- คำถามเพิ่มเติม (เรต / พิมพ์) ---------- */
@@ -207,6 +240,21 @@
     if (!data.classroom) { setError("classroom", "กรุณาเลือกห้องเรียน"); ok = false; }
     if (picked.length !== rankCount) { flash("กรุณาเลือกสาขาที่สนใจให้ครบ " + rankCount + " อันดับ"); ok = false; }
 
+    // เหตุผลของแต่ละอันดับ (บังคับตอบทุกช่อง)
+    if (askReason) {
+      picked.forEach(function (id) {
+        var r = reasonByProgram[id];
+        var box = rankReasonsEl && rankReasonsEl.querySelector('.field-error[data-for="reason-' + id + '"]');
+        var bad = !r || !r.trim();
+        if (box) {
+          box.textContent = bad ? "กรุณาพิมพ์เหตุผลของอันดับนี้" : "";
+          box.classList.toggle("show", bad);
+        }
+        if (bad) ok = false;
+      });
+      if (!ok && picked.length === rankCount) flash("กรุณาพิมพ์เหตุผลของทุกอันดับให้ครบ");
+    }
+
     (CFG.QUESTIONS || []).forEach(function (q) {
       if (!q.required) return;
       var a = answers[q.id];
@@ -241,7 +289,8 @@
       choice1: picked[0] || "",
       choice2: picked[1] || "",
       choice3: picked[2] || "",
-      answers: answers
+      answers: answers,
+      reasons: askReason ? picked.map(function (id) { return reasonByProgram[id] || ""; }) : []
     };
 
     if (!validate(data)) return;
@@ -286,7 +335,10 @@
     var detail = document.getElementById("successDetail");
     var ranks = picked.map(function (id) {
       var p = window.programById(id);
-      return "<li>" + (p ? esc(p.th) : "-") + "</li>";
+      var reason = askReason && reasonByProgram[id]
+        ? "<br><span style='color:#6b7280;font-size:0.88em'>เหตุผล: " + esc(reasonByProgram[id]) + "</span>"
+        : "";
+      return "<li>" + (p ? esc(p.th) : "-") + reason + "</li>";
     }).join("");
 
     var extra = "";

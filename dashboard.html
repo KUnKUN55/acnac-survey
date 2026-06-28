@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v=6" />
+  <link rel="stylesheet" href="assets/css/style.css?v=7" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -147,6 +147,10 @@
               <label for="rankCountInput">ให้นักเรียนเลือกกี่อันดับ:</label>
               <input class="input" id="rankCountInput" type="number" min="1" value="3" />
             </div>
+            <label class="reason-toggle">
+              <input type="checkbox" id="askReasonInput" />
+              <span>ให้นักเรียน <b>พิมพ์เหตุผลของแต่ละอันดับ</b> ที่เลือก (บังคับตอบ — ไม่ตอบส่งไม่ได้)</span>
+            </label>
           </div>
 
           <!-- ห้องเรียน -->
@@ -202,7 +206,7 @@
     </div>
   </div>
 
-  <script src="assets/js/config.js?v=6"></script>
-  <script src="assets/js/dashboard.js?v=6"></script>
+  <script src="assets/js/config.js?v=7"></script>
+  <script src="assets/js/dashboard.js?v=7"></script>
 </body>
 </html>

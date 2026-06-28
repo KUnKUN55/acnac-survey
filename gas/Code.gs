@@ -41,7 +41,8 @@ var DEFAULT_CONFIG = {
   ],
   classes: ["3/1", "3/2", "3/3", "3/4", "3/5", "3/EP"],
   rankCount: 3,
-  questions: []   // คำถามเพิ่มเติม: { id, label, type: "rate"|"text", max?, required? }
+  askReason: false,  // ถามเหตุผลของแต่ละอันดับ (บังคับตอบ)
+  questions: []      // คำถามเพิ่มเติม: { id, label, type: "rate"|"text", max?, required? }
 };
 
 /* ============================================================
@@ -107,6 +108,18 @@ function handleSubmit(p) {
       if (a === undefined || a === null || String(a).trim() === "") {
         return json({ ok: false, error: "กรุณาตอบคำถาม: " + q.label });
       }
+    }
+  }
+
+  // เหตุผลของแต่ละอันดับ (ถ้าครูเปิดใช้ — บังคับตอบทุกช่อง) เก็บลง answers: reason1..reasonN
+  if (cfg.askReason) {
+    var reasons = Array.isArray(p.reasons) ? p.reasons : [];
+    for (var rr = 0; rr < rankCount; rr++) {
+      var rv = reasons[rr];
+      if (rv === undefined || rv === null || String(rv).trim() === "") {
+        return json({ ok: false, error: "กรุณาพิมพ์เหตุผลของอันดับ " + (rr + 1) });
+      }
+      answers["reason" + (rr + 1)] = String(rv);
     }
   }
 
@@ -224,6 +237,7 @@ function handleSaveConfig(body) {
 
   cfg.rankCount = Math.max(1, Math.min(parseInt(cfg.rankCount, 10) || 3, cfg.programs.length));
   cfg.questions = Array.isArray(cfg.questions) ? cfg.questions : [];
+  cfg.askReason = !!cfg.askReason;
 
   getConfigSheet().getRange("A1").setValue(JSON.stringify(cfg));
 
@@ -476,11 +490,13 @@ function rebuildExtraSheet(ss, cfg) {
   cfg = cfg || getConfig();
   var questions = cfg.questions || [];
   var classOrder = cfg.classes || [];
+  var askReason = !!cfg.askReason;
+  var rankCount = Math.min(cfg.rankCount || 3, (cfg.programs || []).length) || 0;
 
   var existing = ss.getSheetByName(EXTRA_NAME);
 
-  // ไม่มีคำถามเพิ่มเติม -> ลบชีตทิ้งถ้ามี
-  if (!questions.length) {
+  // ไม่มีคำถามเพิ่มเติมและไม่ได้ถามเหตุผล -> ลบชีตทิ้งถ้ามี
+  if (!questions.length && !askReason) {
     if (existing) ss.deleteSheet(existing);
     return;
   }
@@ -503,6 +519,9 @@ function rebuildExtraSheet(ss, cfg) {
   });
 
   var header = ["ห้อง", "เลขที่", "รหัสนักเรียน", "ชื่อ-นามสกุล"];
+  if (askReason) {
+    for (var rh = 0; rh < rankCount; rh++) header.push("เหตุผลอันดับ " + (rh + 1));
+  }
   questions.forEach(function (q) {
     header.push(q.label + (q.type === "rate" ? " (เรต)" : ""));
   });
@@ -512,6 +531,12 @@ function rebuildExtraSheet(ss, cfg) {
     var answers = {};
     try { answers = v[8] ? JSON.parse(v[8]) : {}; } catch (e) { answers = {}; }
     var line = ["ม." + String(v[4]), String(v[3]), String(v[1]), String(v[2])];
+    if (askReason) {
+      for (var rc = 0; rc < rankCount; rc++) {
+        var rv = answers["reason" + (rc + 1)];
+        line.push(rv === undefined || rv === null ? "" : String(rv));
+      }
+    }
     questions.forEach(function (q) {
       var a = answers[q.id];
       line.push(a === undefined || a === null ? "" : String(a));
@@ -541,8 +566,12 @@ function rebuildExtraSheet(ss, cfg) {
   sh.setColumnWidth(2, 60);
   sh.setColumnWidth(3, 115);
   sh.setColumnWidth(4, 200);
+  var col = 5;
+  if (askReason) {
+    for (var rw = 0; rw < rankCount; rw++) sh.setColumnWidth(col++, 240);
+  }
   for (var c = 0; c < questions.length; c++) {
-    sh.setColumnWidth(5 + c, questions[c].type === "rate" ? 130 : 260);
+    sh.setColumnWidth(col++, questions[c].type === "rate" ? 130 : 260);
   }
 
   ss.setActiveSheet(sh);

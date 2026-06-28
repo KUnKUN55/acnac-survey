@@ -19,6 +19,9 @@ window.APP_CONFIG = {
   // จำนวนอันดับที่ให้นักเรียนเลือก (ปรับได้จากหน้า Dashboard ครู)
   rankCount: 3,
 
+  // ถามเหตุผลของแต่ละอันดับที่เลือก (บังคับตอบ) — เปิด/ปิดจากหน้า Dashboard ครู
+  askReason: false,
+
   // สาขา (ค่าสำรอง — ของจริงโหลดจาก Sheet)
   PROGRAMS: [
     { id: "health",  th: "สาขาวิทยาศาสตร์สุขภาพและการแพทย์", en: "Health and Medical Science Program" },
@@ -89,5 +92,6 @@ window.applyLiveConfig = function (config, sheetUrl) {
   if (config.classes && config.classes.length)   CFG.CLASSES = config.classes;
   CFG.QUESTIONS = Array.isArray(config.questions) ? config.questions : [];
   if (config.rankCount) CFG.rankCount = config.rankCount;
+  CFG.askReason = !!config.askReason;
   if (sheetUrl) CFG.SHEET_URL = sheetUrl;
 };
