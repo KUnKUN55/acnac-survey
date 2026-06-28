@@ -257,6 +257,24 @@ select.input {
 .rank-summary__row b { color: var(--maroon); }
 .rank-summary__row .empty { color: var(--muted); font-style: italic; }
 
+/* ---------- คำถามเพิ่มเติม: เรต (ดาว) ---------- */
+.q-field { margin-bottom: 18px; }
+.rate { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.rate__star {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.9rem;
+  line-height: 1;
+  color: #d9d2c6;
+  padding: 2px 1px;
+  transition: transform 0.08s, color 0.12s;
+}
+.rate__star:hover { transform: scale(1.12); }
+.rate__star.on { color: var(--gold); }
+.rate__label { margin-left: 10px; font-size: 0.85rem; color: var(--muted); font-weight: 700; }
+textarea.input { resize: vertical; min-height: 64px; line-height: 1.5; }
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
@@ -655,3 +673,97 @@ table.data tbody tr:last-child td { border-bottom: none; }
   flex-wrap: wrap;
 }
 .topbar .site-header { flex: 1 1 auto; }
+
+/* ============================================================
+   แท็บจัดการแบบสอบถาม (ครู)
+   ============================================================ */
+.manage-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+.manage-grid .manage-full { grid-column: 1 / -1; }
+@media (max-width: 760px) { .manage-grid { grid-template-columns: 1fr; } }
+
+.edit-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 14px; }
+.edit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #faf7f1;
+}
+.edit-item--chip { display: inline-flex; }
+.edit-item__idx {
+  width: 24px; height: 24px; flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--maroon); color: #fff;
+  font-size: 0.78rem; font-weight: 800;
+  display: grid; place-items: center;
+}
+.edit-item__main { flex: 1 1 auto; min-width: 0; font-size: 0.92rem; }
+.edit-item__main b { font-weight: 700; }
+.edit-item__main small { display: block; color: var(--muted); font-size: 0.78rem; font-weight: 500; }
+
+.del-btn {
+  flex-shrink: 0;
+  border: 1px solid #f0c4bd;
+  background: #fdecea;
+  color: var(--danger);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.del-btn:hover { background: #f9d9d4; }
+
+.q-badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.q-badge--rate { background: #fff4d6; color: #8a6400; }
+.q-badge--text { background: #e3ecf7; color: #1f3a6e; }
+.q-badge--req  { background: #fdecea; color: var(--danger); }
+
+.add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.add-row .input { flex: 1 1 140px; width: auto; }
+.add-row .btn { flex-shrink: 0; }
+.add-row--q .req-check {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.85rem; font-weight: 700; white-space: nowrap;
+}
+.add-row--q #newQType { flex: 0 0 auto; }
+.add-row--q #newQMax { flex: 0 0 72px; }
+
+.rank-count-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+.rank-count-row label { font-weight: 700; font-size: 0.9rem; }
+.rank-count-row .input { width: 80px; flex: 0 0 auto; }
+
+.manage-actions {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+#sheetLink { text-decoration: none; }

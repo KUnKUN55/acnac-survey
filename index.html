@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v=5" />
+  <link rel="stylesheet" href="assets/css/style.css?v=6" />
 </head>
 <body>
   <div class="container">
@@ -68,12 +68,15 @@
       <!-- ขั้นที่ 2: เลือกสาขา -->
       <section class="card">
         <h2 class="card__title"><span class="step-badge">2</span> จัดอันดับสาขาที่สนใจ</h2>
-        <p class="card__subtitle">แตะเลือกสาขาที่สนใจ <b>3 อันดับ</b> ระบบจะใส่หมายเลขอันดับให้อัตโนมัติ (แตะซ้ำเพื่อยกเลิก)</p>
+        <p class="card__subtitle" id="rankSubtitle">แตะเลือกสาขาที่สนใจ ระบบจะใส่หมายเลขอันดับให้อัตโนมัติ (แตะซ้ำเพื่อยกเลิก)</p>
 
         <div class="programs" id="programs"><!-- เติมด้วย JS --></div>
 
         <div class="rank-summary" id="rankSummary"><!-- เติมด้วย JS --></div>
       </section>
+
+      <!-- ขั้นที่ 3: คำถามเพิ่มเติม (เติมด้วย JS ตามที่ครูตั้งค่า) -->
+      <div id="extraQuestions"></div>
 
       <section class="card">
         <button type="submit" class="btn btn--primary" id="submitBtn">
@@ -111,7 +114,7 @@
     </footer>
   </div>
 
-  <script src="assets/js/config.js?v=5"></script>
-  <script src="assets/js/survey.js?v=5"></script>
+  <script src="assets/js/config.js?v=6"></script>
+  <script src="assets/js/survey.js?v=6"></script>
 </body>
 </html>

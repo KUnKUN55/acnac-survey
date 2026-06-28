@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v=5" />
+  <link rel="stylesheet" href="assets/css/style.css?v=6" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -45,6 +45,7 @@
           <p>โรงเรียนอัสสัมชัญนครราชสีมา · ชั้น ม.3</p>
         </div>
       </header>
+      <a class="btn btn--ghost btn--sm" id="sheetLink" href="#" target="_blank" rel="noopener" style="display:none">📊 เปิด Google Sheet</a>
       <button class="btn btn--gold btn--sm" id="refreshBtn">↻ รีเฟรชข้อมูล</button>
       <button class="btn btn--ghost btn--sm" id="logoutBtn">ออกจากระบบ</button>
     </div>
@@ -57,6 +58,7 @@
       <button class="tab active" data-tab="overall">ภาพรวมสายชั้น</button>
       <button class="tab" data-tab="byroom">แยกรายห้อง</button>
       <button class="tab" data-tab="individual">รายบุคคล</button>
+      <button class="tab" data-tab="manage">⚙️ จัดการแบบสอบถาม</button>
     </div>
 
     <div id="dashBody">
@@ -125,6 +127,62 @@
         </div>
         <div id="individualList"></div>
       </section>
+
+      <!-- TAB: จัดการแบบสอบถาม -->
+      <section class="tab-panel" data-panel="manage">
+        <div id="manageAlert" class="alert"></div>
+
+        <div class="manage-grid">
+          <!-- สาขา -->
+          <div class="chart-card">
+            <h3>🎓 สาขาที่ให้เลือก</h3>
+            <p class="sub">เพิ่ม / ลบ สาขา และกำหนดจำนวนอันดับที่นักเรียนต้องเลือก</p>
+            <div id="progList" class="edit-list"></div>
+            <div class="add-row">
+              <input class="input" id="newProgTh" placeholder="ชื่อสาขา (ภาษาไทย) *" />
+              <input class="input" id="newProgEn" placeholder="ชื่อภาษาอังกฤษ (ไม่บังคับ)" />
+              <button class="btn btn--gold btn--sm" id="addProgBtn" type="button">+ เพิ่มสาขา</button>
+            </div>
+            <div class="rank-count-row">
+              <label for="rankCountInput">ให้นักเรียนเลือกกี่อันดับ:</label>
+              <input class="input" id="rankCountInput" type="number" min="1" value="3" />
+            </div>
+          </div>
+
+          <!-- ห้องเรียน -->
+          <div class="chart-card">
+            <h3>🏫 ห้องเรียน</h3>
+            <p class="sub">เพิ่ม / ลบ ห้องเรียน (เช่น 3/1, 3/EP)</p>
+            <div id="classList" class="edit-list"></div>
+            <div class="add-row">
+              <input class="input" id="newClass" placeholder="เช่น 3/6" />
+              <button class="btn btn--gold btn--sm" id="addClassBtn" type="button">+ เพิ่มห้อง</button>
+            </div>
+          </div>
+
+          <!-- คำถามเพิ่มเติม -->
+          <div class="chart-card manage-full">
+            <h3>❓ คำถามเพิ่มเติม</h3>
+            <p class="sub">เพิ่ม / ลบ คำถาม และเลือกรูปแบบคำตอบ — <b>เรต</b> (ให้คะแนนดาว) หรือ <b>พิมพ์</b> (พิมพ์ข้อความ)</p>
+            <div id="qList" class="edit-list"></div>
+            <div class="add-row add-row--q">
+              <input class="input" id="newQLabel" placeholder="ข้อความคำถาม *" />
+              <select class="input" id="newQType">
+                <option value="rate">เรต (ให้คะแนนดาว)</option>
+                <option value="text">พิมพ์ (ข้อความ)</option>
+              </select>
+              <input class="input" id="newQMax" type="number" min="2" max="10" value="5" title="จำนวนดาวสูงสุด" />
+              <label class="req-check"><input type="checkbox" id="newQReq" /> บังคับตอบ</label>
+              <button class="btn btn--gold btn--sm" id="addQBtn" type="button">+ เพิ่มคำถาม</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="manage-actions">
+          <button class="btn btn--primary" id="saveCfgBtn" type="button" style="max-width:320px">💾 บันทึกการตั้งค่า</button>
+          <span class="tap-hint" id="saveHint"></span>
+        </div>
+      </section>
     </div>
 
     <footer class="site-footer">
@@ -144,7 +202,7 @@
     </div>
   </div>
 
-  <script src="assets/js/config.js?v=5"></script>
-  <script src="assets/js/dashboard.js?v=5"></script>
+  <script src="assets/js/config.js?v=6"></script>
+  <script src="assets/js/dashboard.js?v=6"></script>
 </body>
 </html>
